@@ -10,7 +10,7 @@ import { LoadsExchangeRates } from "./dependencies/ProvidesExchangeRate.ts";
 let parser: ParsesCsvFile;
 let store: StoresExchangeRate & LoadsExchangeRates;
 
-function setupEach() {
+function beforeEach() {
   parser = new CsvParser();
   store = new ExchangeRateStore();
 }
@@ -26,7 +26,7 @@ Deno.test("LoadExchangeRates stores no exchange rates for an empty input file", 
 });
 
 Deno.test("LoadExchangeRates loads an exchange rate", async () => {
-  setupEach();
+  beforeEach();
   const sut = new LoadExchangeRates(parser, store);
   const expectedExchangeRate = ExchangeRate.of({
     currencyIsoCode: "XAF",
@@ -43,7 +43,7 @@ Deno.test("LoadExchangeRates loads an exchange rate", async () => {
 });
 
 Deno.test("LoadExchangeRates skips incomplete rows", async () => {
-  setupEach();
+  beforeEach();
   const parser = new CsvParser();
   const store = new ExchangeRateStore();
   const sut = new LoadExchangeRates(parser, store);
@@ -55,7 +55,7 @@ Deno.test("LoadExchangeRates skips incomplete rows", async () => {
 });
 
 Deno.test("LoadExchangeRates skips rows with description", async () => {
-  setupEach();
+  beforeEach();
   const parser = new CsvParser();
   const store = new ExchangeRateStore();
   const sut = new LoadExchangeRates(parser, store);

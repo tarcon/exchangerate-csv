@@ -8,12 +8,12 @@ import { LoadsExchangeRates } from "./dependencies/ProvidesExchangeRate.ts";
 
 let store: StoresExchangeRate & LoadsExchangeRates;
 
-function setupEach() {
+function beforeEach() {
   store = new ExchangeRateStore();
 }
 
 Deno.test("AddExchangeRate adds user input to the ExchangeRate store", async () => {
-  setupEach();
+  beforeEach();
   const inputModel: AddExchangeRateInput = {
     currencyIsoCode: "XAF",
     from: "10.12.2010",
