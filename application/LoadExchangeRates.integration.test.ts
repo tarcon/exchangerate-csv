@@ -16,8 +16,7 @@ function beforeEach() {
 }
 
 Deno.test("LoadExchangeRates stores no exchange rates for an empty input file", async () => {
-  const parser = new CsvParser();
-  const store = new ExchangeRateStore();
+  beforeEach();
   const sut = new LoadExchangeRates(parser, store);
 
   await sut.execute("outer/input/test/kurse_empty.csv");
