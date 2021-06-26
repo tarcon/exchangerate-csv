@@ -8,6 +8,6 @@ export class AddExchangeRate {
 
   async execute(inputModel: AddExchangeRateInput) {
     const exchangeRate = ExchangeRate.of(inputModel);
-    this._store.store(exchangeRate);
+    this._store.save(exchangeRate);
   }
 }

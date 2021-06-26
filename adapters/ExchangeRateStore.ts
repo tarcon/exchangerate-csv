@@ -6,7 +6,7 @@ export class ExchangeRateStore
   implements StoresExchangeRate, LoadsExchangeRates {
   private memory: ExchangeRate[] = [];
 
-  store(exchangeRate: ExchangeRate): void {
+  save(exchangeRate: ExchangeRate): void {
     this.memory.push(exchangeRate);
   }
 

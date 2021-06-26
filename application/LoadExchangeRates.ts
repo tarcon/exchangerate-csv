@@ -17,6 +17,6 @@ export class LoadExchangeRates {
 
     const exchangeRates = validatedCsvRows.map((row) => ExchangeRate.of(row));
 
-    exchangeRates.map((exchangeRate) => this._store.store(exchangeRate));
+    exchangeRates.map((exchangeRate) => this._store.save(exchangeRate));
   }
 }
