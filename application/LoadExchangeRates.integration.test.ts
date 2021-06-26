@@ -55,12 +55,20 @@ Deno.test("LoadExchangeRates skips incomplete rows", async () => {
 
 Deno.test("LoadExchangeRates skips rows with description", async () => {
   beforeEach();
-  const parser = new CsvParser();
-  const store = new ExchangeRateStore();
   const sut = new LoadExchangeRates(parser, store);
 
   await sut.execute("outer/input/test/kurse_single_description.csv");
 
   const storedExchangeRates = store.loadExchangeRates();
   assertEquals(storedExchangeRates.length, 0);
+});
+
+Deno.test("LoadExchangeRates deduplicates parsed inputs duplicates", async () => {
+  beforeEach();
+  const sut = new LoadExchangeRates(parser, store);
+
+  await sut.execute("outer/input/test/kurse_duplicate.csv");
+
+  const storedExchangeRates = store.loadExchangeRates();
+  assertEquals(storedExchangeRates.length, 1);
 });

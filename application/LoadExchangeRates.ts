@@ -15,8 +15,27 @@ export class LoadExchangeRates {
       .filter((row) => row.allCellsDefined())
       .filter((row) => row.doesNotHaveDescription());
 
-    const exchangeRates = validatedCsvRows.map((row) => ExchangeRate.of(row));
-
+    let exchangeRates = validatedCsvRows.map((row) => ExchangeRate.of(row));
+    exchangeRates = this.removeDuplicatedRates(exchangeRates);
     exchangeRates.map((exchangeRate) => this._store.save(exchangeRate));
+  }
+
+  private removeDuplicatedRates(rates: ExchangeRate[]): ExchangeRate[] {
+    return rates.reduce<ExchangeRate[]>((deduplicatedRates, rate) => {
+      if (
+        !deduplicatedRates.some((
+          existingRate,
+        ) => {
+          return (
+            rate.currencyIsoCode === existingRate.currencyIsoCode &&
+            rate.to.toString() === existingRate.to.toString() &&
+            rate.from.toString() === existingRate.from.toString()
+          );
+        })
+      ) {
+        deduplicatedRates.push(rate);
+      }
+      return deduplicatedRates;
+    }, []);
   }
 }
