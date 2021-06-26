@@ -12,7 +12,7 @@ Deno.test("LoadExchangeRates stores no exchange rates for an empty input file", 
   const store = new ExchangeRateStore();
   const sut = new LoadExchangeRates(parser, store);
 
-  await sut.execute("../outer/input/test/kurse_empty.csv");
+  await sut.execute("outer/input/test/kurse_empty.csv");
 
   assertEquals(store.loadExchangeRates(), []);
 });
@@ -35,7 +35,7 @@ Deno.test("LoadExchangeRates loads an exchange rate", async () => {
     exchangeRate: "657,105",
   });
 
-  await sut.execute("../outer/input/test/kurse_single.csv");
+  await sut.execute("outer/input/test/kurse_single.csv");
 
   const storedExchangeRates = store.loadExchangeRates();
   assertEquals(storedExchangeRates.length, 1);
@@ -48,7 +48,7 @@ Deno.test("LoadExchangeRates skips incomplete rows", async () => {
   const store = new ExchangeRateStore();
   const sut = new LoadExchangeRates(parser, store);
 
-  await sut.execute("../outer/input/test/kurse_single_incomplete.csv");
+  await sut.execute("outer/input/test/kurse_single_incomplete.csv");
 
   const storedExchangeRates = store.loadExchangeRates();
   assertEquals(storedExchangeRates.length, 0);
@@ -60,7 +60,7 @@ Deno.test("LoadExchangeRates skips rows with description", async () => {
   const store = new ExchangeRateStore();
   const sut = new LoadExchangeRates(parser, store);
 
-  await sut.execute("../outer/input/test/kurse_single_description.csv");
+  await sut.execute("outer/input/test/kurse_single_description.csv");
 
   const storedExchangeRates = store.loadExchangeRates();
   assertEquals(storedExchangeRates.length, 0);
