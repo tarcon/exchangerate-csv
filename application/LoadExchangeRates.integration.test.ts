@@ -4,10 +4,9 @@ import { ExchangeRateStore } from "../adapters/ExchangeRateStore.ts";
 import { ExchangeRate } from "../entities/ExchangeRate.ts";
 import { CsvParser } from "../adapters/CsvParser.ts";
 
-const parser = new CsvParser();
-const store = new ExchangeRateStore();
-
 Deno.test("LoadExchangeRates stores no exchange rates for an empty input file", async () => {
+  const parser = new CsvParser();
+  const store = new ExchangeRateStore();
   const sut = new LoadExchangeRates(parser, store);
 
   await sut.execute("../outer/input/test/kurse_empty.csv");
@@ -16,6 +15,8 @@ Deno.test("LoadExchangeRates stores no exchange rates for an empty input file", 
 });
 
 Deno.test("LoadExchangeRates loads an exchange rate", async () => {
+  const parser = new CsvParser();
+  const store = new ExchangeRateStore();
   const sut = new LoadExchangeRates(parser, store);
   const expectedExchangeRate = ExchangeRate.of({
     currencyIsoCode: "XAF",
@@ -29,4 +30,15 @@ Deno.test("LoadExchangeRates loads an exchange rate", async () => {
   const storedExchangeRates = store.getExchangeRates();
   assertEquals(storedExchangeRates.length, 1);
   assertEquals(storedExchangeRates, [expectedExchangeRate]);
+});
+
+Deno.test("LoadExchangeRates skips incomplete rows", async () => {
+  const parser = new CsvParser();
+  const store = new ExchangeRateStore();
+  const sut = new LoadExchangeRates(parser, store);
+
+  await sut.execute("../outer/input/test/kurse_single_incomplete.csv");
+
+  const storedExchangeRates = store.getExchangeRates();
+  assertEquals(storedExchangeRates.length, 0);
 });

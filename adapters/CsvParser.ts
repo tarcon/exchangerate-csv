@@ -13,12 +13,14 @@ export class CsvParser implements ParsesCsvFile {
     };
 
     for await (const row of readCSVRows(file, csvReaderOptions)) {
-      rows.push({
-        currencyIsoCode: row[2],
-        from: row[3],
-        to: row[4],
-        exchangeRate: row[1],
-      });
+      rows.push(
+        CsvRow.of({
+          currencyIsoCode: row[2],
+          from: row[3],
+          to: row[4],
+          exchangeRate: row[1],
+        }),
+      );
     }
 
     file.close();
