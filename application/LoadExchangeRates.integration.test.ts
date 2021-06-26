@@ -7,6 +7,14 @@ import { ParsesCsvFile } from "./dependencies/ParsesCsvFile.ts";
 import { StoresExchangeRate } from "./dependencies/StoresExchangeRate.ts";
 import { LoadsExchangeRates } from "./dependencies/ProvidesExchangeRate.ts";
 
+let parser: ParsesCsvFile;
+let store: StoresExchangeRate & LoadsExchangeRates;
+
+function setupEach() {
+  parser = new CsvParser();
+  store = new ExchangeRateStore();
+}
+
 Deno.test("LoadExchangeRates stores no exchange rates for an empty input file", async () => {
   const parser = new CsvParser();
   const store = new ExchangeRateStore();
@@ -16,14 +24,6 @@ Deno.test("LoadExchangeRates stores no exchange rates for an empty input file", 
 
   assertEquals(store.loadExchangeRates(), []);
 });
-
-let parser: ParsesCsvFile;
-let store: StoresExchangeRate & LoadsExchangeRates;
-
-function setupEach() {
-  parser = new CsvParser();
-  store = new ExchangeRateStore();
-}
 
 Deno.test("LoadExchangeRates loads an exchange rate", async () => {
   setupEach();
