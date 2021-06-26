@@ -11,9 +11,11 @@ export class LoadExchangeRates {
 
   public async execute(inputFilePath: string) {
     const csvRows = await this._parser.parseCsv(inputFilePath);
-    const completeCsvRows = csvRows.filter((row) => row.allCellsDefined());
+    const validatedCsvRows = csvRows
+      .filter((row) => row.allCellsDefined())
+      .filter((row) => row.doesNotHaveDescription());
 
-    const exchangeRates = completeCsvRows.map((row) => ExchangeRate.of(row));
+    const exchangeRates = validatedCsvRows.map((row) => ExchangeRate.of(row));
 
     exchangeRates.map((exchangeRate) => this._store.store(exchangeRate));
   }

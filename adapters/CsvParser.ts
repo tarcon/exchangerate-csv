@@ -19,6 +19,7 @@ export class CsvParser implements ParsesCsvFile {
           from: row[3],
           to: row[4],
           exchangeRate: row[1],
+          description: row[5],
         }),
       );
     }
