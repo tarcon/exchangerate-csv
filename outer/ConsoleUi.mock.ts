@@ -9,6 +9,7 @@ export class ConsoleUiMock implements RendersExchangeRate, RendersError {
 
   constructor() {
     this.renders = [];
+    this.renderedErrors = [];
   }
 
   renderError(message: string): void {
