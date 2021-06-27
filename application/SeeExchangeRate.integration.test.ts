@@ -28,8 +28,7 @@ function beforeEach() {
     renderExchangeRate(
       presentableExchangeRate: {
         currencyIsoCode: string;
-        from: string;
-        to: string;
+        exchangeRate: string;
       },
     ): void {
       this.renders.push(presentableExchangeRate);
@@ -81,7 +80,6 @@ Deno.test("SeeExchangeRates shows a matching exchange rate", async () => {
 
   assertEquals(renderedViewModel, {
     currencyIsoCode: "XAF",
-    from: "10.12.2010",
-    to: "09.01.2011",
+    exchangeRate: "100",
   });
 });
