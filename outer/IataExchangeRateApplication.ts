@@ -1,16 +1,16 @@
-import { AddExchangeRate } from "./application/AddExchangeRate.ts";
-import { ExchangeRateStore } from "./adapters/ExchangeRateStore.ts";
+import { SeeExchangeRate } from "../application/SeeExchangeRate.ts";
+import { SeeExchangeRateInput } from "../application/SeeExchangeRate.input.ts";
 import {
   ExchangeRatePresenter,
   RendersError,
   RendersExchangeRate,
-} from "./adapters/ExchangeRatePresenter.ts";
-import { LoadExchangeRates } from "./application/LoadExchangeRates.ts";
-import { CsvParser } from "./adapters/CsvParser.ts";
-import { SeeExchangeRate } from "./application/SeeExchangeRate.ts";
-import { UseCase } from "./application/UseCase.ts";
-import { AddExchangeRateInput } from "./application/AddExchangeRate.input.ts";
-import { SeeExchangeRateInput } from "./application/SeeExchangeRate.input.ts";
+} from "../adapters/ExchangeRatePresenter.ts";
+import { LoadExchangeRates } from "../application/LoadExchangeRates.ts";
+import { ExchangeRateStore } from "../adapters/ExchangeRateStore.ts";
+import { UseCase } from "../application/UseCase.ts";
+import { CsvParser } from "../adapters/CsvParser.ts";
+import { AddExchangeRate } from "../application/AddExchangeRate.ts";
+import { AddExchangeRateInput } from "../application/AddExchangeRate.input.ts";
 
 export class IataExchangeRateApplication
   implements RendersExchangeRate, RendersError {

@@ -1,4 +1,4 @@
-import { IataExchangeRateApplication } from "./IataExchangeRateApplication.ts";
+import { IataExchangeRateApplication } from "./outer/IataExchangeRateApplication.ts";
 
 (function main() {
   new IataExchangeRateApplication().run();
