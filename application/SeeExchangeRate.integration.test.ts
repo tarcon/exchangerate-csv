@@ -44,8 +44,7 @@ Deno.test("SeeExchangeRates shows no exchange rates for an empty exchange rate s
 
   const input: SeeExchangeRateInput = {
     currencyIsoCode: "XAF",
-    from: "10.12.2010",
-    to: "09.01.2011",
+    date: "09.01.2011",
   };
 
   const sut = new SeeExchangeRate(store, ui);
@@ -68,8 +67,7 @@ Deno.test("SeeExchangeRates shows a matching exchange rate", async () => {
 
   const input: SeeExchangeRateInput = {
     currencyIsoCode: "XAF",
-    from: "10.12.2010",
-    to: "09.01.2011",
+    date: "10.12.2010",
   };
 
   const sut = new SeeExchangeRate(store, ui);
