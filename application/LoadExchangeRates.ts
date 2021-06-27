@@ -25,13 +25,11 @@ export class LoadExchangeRates {
       if (
         !deduplicatedRates.some((
           existingRate,
-        ) => {
-          return (
-            rate.currencyIsoCode === existingRate.currencyIsoCode &&
-            rate.to.toString() === existingRate.to.toString() &&
-            rate.from.toString() === existingRate.from.toString()
-          );
-        })
+        ) => (
+          rate.currencyIsoCode === existingRate.currencyIsoCode &&
+          rate.to.toString() === existingRate.to.toString() &&
+          rate.from.toString() === existingRate.from.toString()
+        ))
       ) {
         deduplicatedRates.push(rate);
       }
