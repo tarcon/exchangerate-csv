@@ -1,12 +1,14 @@
 import { ParsesCsvFile } from "./dependencies/ParsesCsvFile.ts";
 import { StoresExchangeRate } from "./dependencies/StoresExchangeRate.ts";
 import { ExchangeRate } from "../entities/ExchangeRate.ts";
+import { UseCase } from "./UseCase.ts";
 
-export class LoadExchangeRates {
+export class LoadExchangeRates extends UseCase<string, void> {
   constructor(
     private readonly _parser: ParsesCsvFile,
     private readonly _store: StoresExchangeRate,
   ) {
+    super();
   }
 
   public async execute(inputFilePath: string) {

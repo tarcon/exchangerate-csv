@@ -3,12 +3,14 @@ import { parse } from "https://deno.land/std@0.99.0/datetime/mod.ts";
 import { LoadsExchangeRates } from "./dependencies/ProvidesExchangeRate.ts";
 import { DisplaysExchangeRate } from "./dependencies/DisplaysExchangeRate.ts";
 import { SeeExchangeRateInput } from "./SeeExchangeRate.input.ts";
+import { UseCase } from "./UseCase.ts";
 
-export class SeeExchangeRate {
+export class SeeExchangeRate extends UseCase<SeeExchangeRateInput, void> {
   constructor(
     private readonly store: LoadsExchangeRates,
     private readonly ui: DisplaysExchangeRate,
   ) {
+    super();
   }
 
   async execute(input: SeeExchangeRateInput) {
