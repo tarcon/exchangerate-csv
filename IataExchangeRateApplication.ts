@@ -1,81 +1,132 @@
-import { parse } from "https://deno.land/std@0.99.0/datetime/mod.ts";
+import { AddExchangeRate } from "./application/AddExchangeRate.ts";
+import { ExchangeRateStore } from "./adapters/ExchangeRateStore.ts";
+import {
+  ExchangeRatePresenter,
+  RendersError,
+  RendersExchangeRate,
+} from "./adapters/ExchangeRatePresenter.ts";
+import { LoadExchangeRates } from "./application/LoadExchangeRates.ts";
+import { CsvParser } from "./adapters/CsvParser.ts";
+import { SeeExchangeRate } from "./application/SeeExchangeRate.ts";
+import { UseCase } from "./application/UseCase.ts";
+import { AddExchangeRateInput } from "./application/AddExchangeRate.input.ts";
+import { SeeExchangeRateInput } from "./application/SeeExchangeRate.input.ts";
 
-export class IataExchangeRateApplication {
-  public run() {
-    this.readIataExchangeRates();
+export class IataExchangeRateApplication
+  implements RendersExchangeRate, RendersError {
+  useCases: {
+    LoadExchangeRates: UseCase<string, void>;
+    AddExchangeRate: UseCase<AddExchangeRateInput, void>;
+    SeeExchangeRate: UseCase<SeeExchangeRateInput, void>;
+  };
+
+  constructor() {
+    const csvParser = new CsvParser();
+    const exchangeRatePresenter = new ExchangeRatePresenter(this);
+    const exchangeRateStore = new ExchangeRateStore();
+
+    this.useCases = {
+      LoadExchangeRates: new LoadExchangeRates(csvParser, exchangeRateStore),
+      AddExchangeRate: new AddExchangeRate(
+        exchangeRateStore,
+        exchangeRatePresenter,
+      ),
+      SeeExchangeRate: new SeeExchangeRate(
+        exchangeRateStore,
+        exchangeRatePresenter,
+      ),
+    };
+  }
+
+  public async run() {
+    await this.readIataExchangeRates();
 
     this.displayMenu();
 
     let exitRequested = false;
-
     while (!exitRequested) {
       const userInput = this.getUserInput();
-
-      exitRequested = this.processUserInputAndCheckForExitRequest(userInput);
+      exitRequested = await this.processUserInputAndCheckForExitRequest(
+        userInput,
+      );
     }
 
     console.log("Auf Wiedersehen!");
   }
 
-  readIataExchangeRates() {
-    //TODO: Hier muss das Einlesen der IATA-W�hrungskurse aus der Datei geschehen.
+  async readIataExchangeRates() {
+    try {
+      await this.useCases.LoadExchangeRates.execute("outer/input/kurse.csv");
+    } catch (e) {
+      this.renderError("Fehler beim Starten");
+    }
   }
 
   private displayMenu(): void {
-    console.log("IATA W�hrungskurs-Beispiel");
+    console.log("IATA Währungskurs-Beispiel");
     console.log();
 
     console.log(
-      "W�hlen Sie eine Funktion durch Auswahl der Zifferntaste und Dr�cken von 'Return'",
+      "Wählen Sie eine Funktion durch Auswahl der Zifferntaste und Drücken von 'Return'",
     );
-    console.log("[1] W�hrungskurs anzeigen");
-    console.log("[2] Neuen W�hrungskurs eingeben");
+    console.log("[1] Währungskurs anzeigen");
+    console.log("[2] Neuen Währungskurs eingeben");
     console.log();
 
     console.log("[0] Beenden");
   }
 
   private getUserInput(): string {
-    const input = prompt("input: ");
+    let input = prompt("");
     if (!input) {
-      throw new Error("no input");
+      input = "";
+      this.displayMenu();
     }
     return input;
   }
 
-  //Returns true when the user wants to exit the application
-  private processUserInputAndCheckForExitRequest(userInput: string): boolean {
+  private async processUserInputAndCheckForExitRequest(
+    userInput: string,
+  ): Promise<boolean> {
     if (userInput === "0") {
       return true;
     }
 
     if (userInput === "1") {
-      this.displayIataExchangeRate();
+      await this.displayExchangeRate();
     } else if (userInput === ("2")) {
-      this.enterIataExchangeRate();
+      await this.enterIataExchangeRate();
     } else {
-      console.log("Falsche Eingabe. Versuchen Sie es bitte erneut.");
+      this.displayMenu();
     }
 
     return false;
   }
 
-  private displayIataExchangeRate(): void {
-    const currencyIsoCode = this.getUserInputForStringField("W�hrung");
+  private async displayExchangeRate() {
+    const currencyIsoCode = this.getUserInputForStringField("Währung");
     const date = this.getUserInputForDateField("Datum");
 
-    //TODO: Mit currencyIsoCode und date sollte hier der Kurs ermittelt und ausgegeben werden.
+    await this.useCases.SeeExchangeRate.execute({
+      currencyIsoCode: currencyIsoCode,
+      date,
+    });
   }
 
-  private enterIataExchangeRate(): void {
-    const currencyIsoCode = this.getUserInputForStringField("W�hrung");
+  private async enterIataExchangeRate() {
+    const currencyIsoCode = this.getUserInputForStringField("Währung");
     const from = this.getUserInputForDateField("Von");
     const to = this.getUserInputForDateField("Bis");
     const exchangeRate = this.getUserInputForDoubleField(
-      "Euro-Kurs f�r 1 " + currencyIsoCode,
+      "Euro-Kurs für 1 " + currencyIsoCode,
     );
 
-    //TODO: Aus den Variablen muss jetzt ein Kurs zusammengesetzt und in die eingelesenen Kurse eingef�gt werden.
+    await this.useCases.AddExchangeRate.execute({
+      currencyIsoCode,
+      from,
+      to,
+      exchangeRate,
+    });
   }
 
   private getUserInputForStringField(fieldName: string): string {
@@ -83,14 +134,32 @@ export class IataExchangeRateApplication {
     return this.getUserInput();
   }
 
-  private getUserInputForDateField(fieldName: string): Date {
+  private getUserInputForDateField(fieldName: string): string {
     console.log(fieldName + " (tt.mm.jjjj): ");
-    const dateString = this.getUserInput();
-    return parse(dateString, "dd.MM.yyyy");
+    return this.getUserInput();
   }
 
-  private getUserInputForDoubleField(fieldName: string): number {
-    const doubleString = this.getUserInputForStringField(fieldName);
-    return parseFloat(doubleString);
+  private getUserInputForDoubleField(fieldName: string): string {
+    console.log(fieldName, ": ");
+    return this.getUserInput();
+  }
+
+  renderExchangeRate(
+    presentableExchangeRate: {
+      currencyIsoCode: string;
+      exchangeRate: string;
+    },
+  ): void {
+    console.log(
+      "Währung: " + presentableExchangeRate.currencyIsoCode + " Kurs: " +
+        presentableExchangeRate.exchangeRate,
+    );
+  }
+
+  renderError(message: string): void {
+    console.error(
+      "Fehler " +
+        message,
+    );
   }
 }
