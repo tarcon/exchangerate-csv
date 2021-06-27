@@ -4,38 +4,19 @@ import { StoresExchangeRate } from "./dependencies/StoresExchangeRate.ts";
 import { LoadsExchangeRates } from "./dependencies/ProvidesExchangeRate.ts";
 import { SeeExchangeRate } from "./SeeExchangeRate.ts";
 import { DisplaysExchangeRate } from "./dependencies/DisplaysExchangeRate.ts";
-import {
-  ExchangeRatePresenter,
-  RendersExchangeRate,
-} from "../adapters/ExchangeRatePresenter.ts";
+import { ExchangeRatePresenter } from "../adapters/ExchangeRatePresenter.ts";
 import { SeeExchangeRateInput } from "./SeeExchangeRate.input.ts";
 import { ExchangeRate } from "../entities/ExchangeRate.ts";
+import { ConsoleUiMock } from "../outer/ConsoleUi.mock.ts";
 
 let store: StoresExchangeRate & LoadsExchangeRates;
-let renderSpy: RendersExchangeRate;
-let ui: DisplaysExchangeRate;
+let uiMock: ConsoleUiMock;
+let presenter: DisplaysExchangeRate;
 
 function beforeEach() {
   store = new ExchangeRateStore();
-
-  renderSpy = new class implements RendersExchangeRate {
-    public renders: any;
-
-    constructor() {
-      this.renders = [];
-    }
-
-    renderExchangeRate(
-      presentableExchangeRate: {
-        currencyIsoCode: string;
-        exchangeRate: string;
-      },
-    ): void {
-      this.renders.push(presentableExchangeRate);
-    }
-  }();
-
-  ui = new ExchangeRatePresenter(renderSpy);
+  uiMock = new ConsoleUiMock();
+  presenter = new ExchangeRatePresenter(uiMock);
 }
 
 Deno.test("SeeExchangeRates shows no exchange rates for an empty exchange rate store", async () => {
@@ -46,12 +27,12 @@ Deno.test("SeeExchangeRates shows no exchange rates for an empty exchange rate s
     date: "09.01.2011",
   };
 
-  const sut = new SeeExchangeRate(store, ui);
+  const sut = new SeeExchangeRate(store, presenter);
 
   await sut.execute(input);
 
   // @ts-ignore
-  assertEquals(renderSpy.renders.length, 0);
+  assertEquals(uiMock.renders.length, 0);
 });
 
 Deno.test("SeeExchangeRates shows a matching exchange rate", async () => {
@@ -69,14 +50,12 @@ Deno.test("SeeExchangeRates shows a matching exchange rate", async () => {
     date: "10.12.2010",
   };
 
-  const sut = new SeeExchangeRate(store, ui);
+  const sut = new SeeExchangeRate(store, presenter);
 
   await sut.execute(input);
 
-  // @ts-ignore
-  assertEquals(renderSpy.renders.length, 1);
-  // @ts-ignore
-  const renderedViewModel = renderSpy.renders[0];
+  assertEquals(uiMock.renders.length, 1);
+  const renderedViewModel = uiMock.renders[0];
 
   assertEquals(renderedViewModel, {
     currencyIsoCode: "XAF",
